@@ -4,8 +4,15 @@ import {
   initializeApp as initAdminApp,
   getApps as getAppsAdmin,
 } from "firebase-admin/app";
+import { getMessaging } from "firebase-admin/messaging";
 import { credential } from "firebase-admin";
-import { getFirestore, addDoc, collection } from "firebase/firestore";
+import {
+  getFirestore,
+  addDoc,
+  collection,
+  getDocs,
+  query,
+} from "firebase/firestore";
 
 export default async function handler(req, res) {
   let clientError = false;
@@ -49,6 +56,27 @@ export default async function handler(req, res) {
   if (getApps().length < 1) initApp(firebaseConfig);
 
   const db = getFirestore();
+  const registrationTokens = [];
+  // FCM Tokens a.k.a. device tokens or registration tokens
+  const querySnapshot = await getDocs(query(collection(db, "fcm_tokens")));
+
+  querySnapshot.forEach((doc) => {
+    registrationTokens.push(doc.data().token_id);
+  });
+
+  const message = {
+    data: {
+      title: `New reservation`,
+      body: `New reservation at ${reservation_time} by ${name}.`,
+    },
+    tokens: registrationTokens,
+  };
+
+  getMessaging()
+    .sendMulticast(message)
+    .then((response) => {
+      console.log(response.successCount + " messages were sent successfully");
+    });
 
   await addDoc(collection(db, "reservations"), {
     ...req.body,

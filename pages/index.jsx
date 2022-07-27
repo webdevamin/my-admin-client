@@ -25,7 +25,7 @@ const Home = () => {
     setError('');
 
     try {
-      const res = await axios.post('/api/send', form);
+      await axios.post('/api/send', form);
 
     } catch (e) {
       if (e.response) {
