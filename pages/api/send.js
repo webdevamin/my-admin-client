@@ -45,7 +45,7 @@ export default async function handler(req, res) {
     });
   }
 
-  var serviceAccount = JSON.parse(process.env.NEXT_PUBLIC_FB_ADMIN_SERVICE_ACC);
+  var serviceAccount = JSON.parse(process.env.FB_ADMIN_SERVICE_ACC);
 
   if (getAppsAdmin().length < 1) {
     initAdminApp({
