@@ -2,25 +2,14 @@ import Head from 'next/head'
 import { useState } from 'react'
 import styles from '../styles/Home.module.scss'
 import axios from "axios";
-import firebaseConfig from "../config/firebase";
-import firebase from "firebase/app";
-import "firebase/firestore";
 
 const initForm = {
-  name: '', phone: '', reservation_time: '', units: 1, time_submitted: ''
+  name: '', phone: '', reservation_time: '12:00', units: 1, time_submitted: ''
 }
 
 const reservationTimes = ['12:00', '12:30', '13:00', '13:30', '14:00'];
 
 const Home = () => {
-  if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-  } else {
-    firebase.app();
-  }
-
-  const db = firebase.firestore();
-
   const [form, setForm] = useState(initForm);
   const [error, setError] = useState('');
 
@@ -36,16 +25,7 @@ const Home = () => {
     setError('');
 
     try {
-      await axios.post('/api/send', form);
-
-      db.collection("reservations").add({
-        ...form,
-        time_submitted: (new Date).toTimeString().split(' ')[0]
-      }).then((docRef) => {
-        console.log("Document written with ID: ", docRef.id);
-      }).catch((error) => {
-        console.error("Error adding document: ", error);
-      })
+      const res = await axios.post('/api/send', form);
 
     } catch (e) {
       if (e.response) {

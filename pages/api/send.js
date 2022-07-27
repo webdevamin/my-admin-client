@@ -1,8 +1,13 @@
-import firebase from "firebase/app";
 import firebaseConfig from "../../config/firebase";
-import "firebase/messaging";
+import { initializeApp as initApp, getApps } from "firebase/app";
+import {
+  initializeApp as initAdminApp,
+  getApps as getAppsAdmin,
+} from "firebase-admin/app";
+import { credential } from "firebase-admin";
+import { getFirestore, addDoc, collection } from "firebase/firestore";
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   let clientError = false;
 
   if (req.method !== "POST") {
@@ -23,14 +28,32 @@ export default function handler(req, res) {
     clientError = true;
   }
 
+  if (!reservation_time) {
+    clientError = true;
+  }
+
   if (clientError) {
     res.status(400).json({
       message: "Please fill in the form correctly.",
     });
   }
 
-  firebase.initializeApp(firebaseConfig);
-  const messaging = firebase.messaging();
-  
-  res.status(200).json({ name: "John Doe" });
+  var serviceAccount = JSON.parse(process.env.NEXT_PUBLIC_FB_ADMIN_SERVICE_ACC);
+
+  if (getAppsAdmin().length < 1) {
+    initAdminApp({
+      credential: credential.cert(serviceAccount),
+    });
+  }
+
+  if (getApps().length < 1) initApp(firebaseConfig);
+
+  const db = getFirestore();
+
+  await addDoc(collection(db, "reservations"), {
+    ...req.body,
+    time_submitted: new Date().toTimeString().split(" ")[0],
+  });
+
+  res.status(200).json({ message: "Success" });
 }
