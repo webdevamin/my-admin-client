@@ -72,9 +72,12 @@ export default async function handler(req, res) {
     tokens: registrationTokens,
   };
 
-  getMessaging()
+  console.log("sending message");
+
+  await getMessaging()
     .sendMulticast(message)
     .then((response) => {
+      console.log("sent");
       console.log(response.successCount + " messages were sent successfully");
     });
 
