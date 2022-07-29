@@ -83,7 +83,8 @@ export default async function handler(req, res) {
 
   await addDoc(collection(db, "reservations"), {
     ...req.body,
-    time_submitted: new Date().toTimeString().split(" ")[0],
+    date_submitted: new Date().toLocaleString("nl-BE"),
+    time_submitted: new Date().toTimeString("nl-BE").split(" ")[0],
   });
 
   res.status(200).json({ message: "Success" });

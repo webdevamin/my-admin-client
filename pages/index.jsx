@@ -4,7 +4,7 @@ import styles from '../styles/Home.module.scss'
 import axios from "axios";
 
 const initForm = {
-  name: '', phone: '', reservation_time: '12:00', units: 1, time_submitted: ''
+  name: '', phone: '', reservation_time: '12:00', units: 1
 }
 
 const reservationTimes = ['12:00', '12:30', '13:00', '13:30', '14:00'];
